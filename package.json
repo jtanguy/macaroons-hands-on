@@ -1,0 +1,23 @@
+{
+  "name": "macaroons-hands-on",
+  "version": "1.0.0",
+  "description": "Sample project for macaroons hands on session",
+  "repository": "https://github.com/jtanguy/macaroons-hands-on",
+  "author": "Julien Tanguy <julien.tanguy@jhome.fr>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "simple": "node simple.js",
+    "verify": "node verify.js",
+    "test": "jest src/*",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "hapi": "^16.1.1",
+    "lokijs": "^1.4.3",
+    "macaroons.js": "^0.3.8",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "jest": "^20.0.0"
+  }
+}

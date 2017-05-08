@@ -1,0 +1,42 @@
+.conum[data-value] {
+  display: inline-block;
+  color: #dcdcdc !important;
+  border: 1px solid #dcdcdc;
+  border-radius: 100px;
+  text-align: center;
+  font-size: 0.75em;
+  width: 1.67em;
+  height: 1.67em;
+  line-height: 1.67em;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.conum[data-value] * {
+  color: #fff !important;
+}
+
+.conum[data-value] + b {
+  display: none;
+}
+
+.conum[data-value]:after {
+  content: attr(data-value);
+}
+
+pre .conum[data-value] {
+  position: relative;
+  top: -0.125em;
+}
+
+// hack to disallow syntax highlighting from changing the color
+b.conum * {
+  color: inherit !important;
+}
+
+// hack for when highlight.js adds a bogus element into DOM
+// QUESTION should we solve this w/ javascript instead?
+.conum:not([data-value]):empty {
+  display: none;
+}
