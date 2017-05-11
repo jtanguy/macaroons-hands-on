@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`macaroon:creation m has the correct signature" 1`] = `"7339954339bb20b9ceeb0cd4fff91f66ddbe6cc824efa49f165cbd950bc1dc1f"`;
-
-exports[`macaroon:creation m2 has the correct signature" 1`] = `"c247c5613203141be46a14008678a2aaec41d83c9cf69d7b10b5c4e533047abb"`;
-
-exports[`macaroon:creation m3 has the correct signature" 1`] = `"4bd18fd10c0193ae25fc73ce3f89b46a64ffb6508025ba3faeb5acf2656a99f6"`;

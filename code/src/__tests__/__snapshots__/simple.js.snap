@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Verifying macaroons m is not valid with the wrong secret 1`] = `"Verification failed. Signature doesn't match. Maybe the key was wrong OR some caveats aren't satisfied."`;
+
+exports[`Verifying macaroons m3 is not valid without its discharge macaroon 1`] = `"Couldn't verify 3rd party macaroon, because no discharged macaroon was provided to the verifier."`;

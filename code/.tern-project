@@ -1,0 +1,9 @@
+{
+  "libs": [
+    "macaroons.js"
+  ],
+  "plugins": {
+    "node": {}
+  }
+}
+
