@@ -1,8 +1,7 @@
 = Stateless authorization and delegation with Macaroons
 Julien Tanguy
 v1.0, 2017-05-18: Ncrafts 2017
-:homepage: https://github.com/jtanguy/macaroons-hands-on
-:twitter: jutanguy
+:homepage: https://github.com/jtanguy/macaroons-hands-on :twitter: jutanguy
 :github: jtanguy
 :blog: https://jtanguy.cleverapps.io
 :backend: revealjs
@@ -20,6 +19,8 @@ v1.0, 2017-05-18: Ncrafts 2017
 [source, shell, subs="attributes, macros"]
 ----
 git clone link:{homepage}[{homepage}]
+
+cd code
 
 yarn install
 ----
@@ -143,26 +144,20 @@ Two types of caveats:
 - _first party_ caveats, which directly restrict the macaroon's authority, and
 - _third party_ caveats, which require additional evidence.
 
-=== First party caveats
+== First party caveats
 
-- Simple assertions/predicates
-- Only need the caveat id: String
+Simple assertions
 
-//
-
-.First party caveats
 ====
 - `account = 123456`
 - `file in ["accounts.pdf","bills.pdf"]`
 - `time < 2017-05-18T14:45+02:00`
 ====
 
-=== Third party caveats
+=== Structure
 
-- External predicates not listed in the macaroon
-- Must be discharged by a special _discharging_ macaroon
-- caveat id, caveat location and caveat verifier key
-
+`cid: String`::
+Caveat id (the predicate)
 
 
 == Computing the signature
@@ -205,15 +200,60 @@ cid time < 2017-05-18T14:45+02:00
 signature 4bd18fd10c0193ae25fc73ce3f89b46a64ffb6508025ba3faeb5acf2656a99f6
 ----
 
+== Third party caveats
+
+- External predicates not listed in the macaroon
+- The predicate is sent to the third party, and an identifier is given back.
+
+====
+- The user must be logged to `auth.com` as _Alice_
+- The user must have a valid session on our service as _Bob_
+====
+
+
+=== Structure
+
+`key: String`::
+Predicate to be satisfied by the third party
+`cid: String`::
+Caveat Id (the third party identifier)
+`cl: Url`::
+Url of the third party
+`vid: String`::
+stem:[enc(sig, key)]
+
 
 == Verifying macaroons
 
-One only need to know the secret and how to verify each caveat
-
+[.step]
+- Signature
 - First party caveats
+- Third party caveats
 
 
-== References
+
+== Verifying first party caveats
+
+[.step]
+. Just check the predicate, parse it and verify it
+. ???
+. Profit !
+
+== Verifying third party caveats
+
+Third party macaroons must be _discharged_ by another macaroon, which must verify
+
+[.step]
+- The root secret of the discharging macaroon must match the one used
+  to mint the caveat
+- The verifier id must match
+- The discharging caveat must be bound to the discharged caveat
+
+== Let's code
+
+== Tootsample
+
+== Links
 
 [bibliography]
 - [[[pub41892]]] Arnar Birgisson and Joe Gibbs Politz and Úlfar Erlingsson and
@@ -221,4 +261,7 @@ Ankur Taly and Michael Vrable and Mark Lentczner. Macaroons: Cookies with
 Contextual Caveats for Decentralized Authorization in the Cloud. Network and
 Distributed System Security Symposium, Internet Society. 2014.
 https://research.google.com/pubs/pub41892.html
+- [[[cordellBlog]]] Evan Cordell. Macaroons 101: Contextual Confinement.
+Elegent authorization, for a more civilized age. 2015.
+http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html
 
