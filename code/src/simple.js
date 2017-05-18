@@ -21,8 +21,6 @@ const c = 'talk = macaroons-hands-on';
 const c2 = 'time < 2017-05-18T14:45+02:00';
 
 const m2 = new MacaroonsBuilder(location, secret, identifier)
-    .add_first_party_caveat(c)
-    .add_first_party_caveat(c2)
     .getMacaroon();
 
 /**
@@ -34,7 +32,6 @@ const predicate = 'user = Alice';
 const authIdentifier = auth.getIdentifierFor(caveat_key, predicate);
 
 const m3 = new MacaroonsBuilder(location, secret, identifier)
-    .add_third_party_caveat(auth.location, caveat_key, authIdentifier)
     .getMacaroon()
 
 module.exports = { location, secret, identifier, m, m2, m3, c, c2 };
