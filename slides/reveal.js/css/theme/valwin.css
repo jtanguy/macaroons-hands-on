@@ -2,14 +2,16 @@
  * Solarized Light theme for reveal.js.
  * Author: Achim Staebler
  */
-@import url(../../lib/font/league-gothic/league-gothic.css);
-@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+@import url("https://fonts.googleapis.com/css?family=Average+Sans");
 /**
  * Solarized colors by Ethan Schoonover
  */
 html * {
   color-profile: sRGB;
   rendering-intent: auto; }
+
+.reveal.reveal pre, .reveal.reveal code {
+  font-family: "Courier New", monospace; }
 
 .reveal.reveal pre {
   width: inherit; }
@@ -34,23 +36,23 @@ html * {
  * GLOBAL STYLES
  *********************************************/
 body {
-  background: #0c5a5d;
-  background-color: #0c5a5d; }
+  background: #0F505D;
+  background-color: #0F505D; }
 
 .reveal {
-  font-family: "Lato", sans-serif;
+  font-family: "Brandon Grotesque", "Lato", sans-serif;
   font-size: 35px;
   font-weight: normal;
   color: #ededed; }
 
 ::selection {
   color: #fff;
-  background: #d33682;
+  background: #ED344E;
   text-shadow: none; }
 
 ::-moz-selection {
   color: #fff;
-  background: #d33682;
+  background: #ED344E;
   text-shadow: none; }
 
 .reveal .slides > section,
@@ -68,8 +70,8 @@ body {
 .reveal h5,
 .reveal h6 {
   margin: 0 0 20px 0;
-  color: #F09393;
-  font-family: "League Gothic", Impact, sans-serif;
+  color: #F9CC0F;
+  font-family: "Futura Md BT", "League Gothic", Impact, sans-serif;
   font-weight: normal;
   line-height: 1.2;
   letter-spacing: normal;
@@ -78,13 +80,13 @@ body {
   word-wrap: break-word; }
 
 .reveal h1 {
-  font-size: 3.77em; }
+  font-size: 3em; }
 
 .reveal h2 {
-  font-size: 2.11em; }
+  font-size: 2em; }
 
 .reveal h3 {
-  font-size: 1.55em; }
+  font-size: 1.2em; }
 
 .reveal h4 {
   font-size: 1em; }
@@ -233,20 +235,20 @@ body {
  * LINKS
  *********************************************/
 .reveal a {
-  color: #268bd2;
+  color: #0B7678;
   text-decoration: none;
   -webkit-transition: color .15s ease;
   -moz-transition: color .15s ease;
   transition: color .15s ease; }
 
 .reveal a:hover {
-  color: #78b9e6;
+  color: #14d2d5;
   text-shadow: none;
   border: none; }
 
 .reveal .roll span:after {
   color: #fff;
-  background: #1a6091; }
+  background: #053132; }
 
 /*********************************************
  * IMAGES
@@ -268,7 +270,7 @@ body {
 
 .reveal a:hover img {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #268bd2;
+  border-color: #0B7678;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.55); }
 
 /*********************************************
@@ -276,31 +278,31 @@ body {
  *********************************************/
 .reveal .controls .navigate-left,
 .reveal .controls .navigate-left.enabled {
-  border-right-color: #268bd2; }
+  border-right-color: #0B7678; }
 
 .reveal .controls .navigate-right,
 .reveal .controls .navigate-right.enabled {
-  border-left-color: #268bd2; }
+  border-left-color: #0B7678; }
 
 .reveal .controls .navigate-up,
 .reveal .controls .navigate-up.enabled {
-  border-bottom-color: #268bd2; }
+  border-bottom-color: #0B7678; }
 
 .reveal .controls .navigate-down,
 .reveal .controls .navigate-down.enabled {
-  border-top-color: #268bd2; }
+  border-top-color: #0B7678; }
 
 .reveal .controls .navigate-left.enabled:hover {
-  border-right-color: #78b9e6; }
+  border-right-color: #14d2d5; }
 
 .reveal .controls .navigate-right.enabled:hover {
-  border-left-color: #78b9e6; }
+  border-left-color: #14d2d5; }
 
 .reveal .controls .navigate-up.enabled:hover {
-  border-bottom-color: #78b9e6; }
+  border-bottom-color: #14d2d5; }
 
 .reveal .controls .navigate-down.enabled:hover {
-  border-top-color: #78b9e6; }
+  border-top-color: #14d2d5; }
 
 /*********************************************
  * PROGRESS BAR
@@ -309,7 +311,7 @@ body {
   background: rgba(0, 0, 0, 0.2); }
 
 .reveal .progress span {
-  background: #268bd2;
+  background: #0B7678;
   -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }

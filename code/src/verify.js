@@ -7,28 +7,25 @@ const MacaroonsVerifier = require('macaroons.js').MacaroonsVerifier;
 const TimestampCaveatVerifier = require('macaroons.js').verifier.TimestampCaveatVerifier;
 const auth = require('./auth');
 
-
-/**
- * Simple macaroon
- */
 const v = new MacaroonsVerifier(m)
 
-
-/**
- * Macaroon with first party caveats
- */
 const v2 = new MacaroonsVerifier(m2)
+    .satisfyExact(c)
+    .satisfyGeneral(TimestampCaveatVerifier)
 
 
-/**
- * Macaroon with first party and third party caveats
- */
+const d = auth.getDischargeMacaroonFor('Alice');
 
 const dp = MacaroonsBuilder.modify(m3)
+    .prepare_for_request(d)
     .getMacaroon()
 
 const v3 = new MacaroonsVerifier(m3)
+    .satisfyExact(c)
 
 const v4 = new MacaroonsVerifier(m3)
+    .satisfyExact(c)
+    .satisfyGeneral(TimestampCaveatVerifier)
+    .satisfy3rdParty(dp)
 
 module.exports = { v, v2, v3, v4 };

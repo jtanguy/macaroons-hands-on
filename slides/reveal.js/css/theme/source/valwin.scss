@@ -12,8 +12,8 @@
 
 
 // Include theme-specific fonts
-@import url(../../lib/font/league-gothic/league-gothic.css);
-@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+@import url('https://fonts.googleapis.com/css?family=Average+Sans');
+
 
 
 /**
@@ -44,13 +44,23 @@ $green:     #859900;
 
 // Override theme settings (see ../template/settings.scss)
 $mainColor: #ededed;
+$headingFont: 'Futura Md BT', 'League Gothic', Impact, sans-serif;
+$heading1Size: 3em;
+$heading2Size: 2em;
+$heading3Size: 1.2em;
+$heading4Size: 1.00em;
+$mainFont: 'Brandon Grotesque', 'Lato', sans-serif;
 $mainFontSize: 35px;
-$headingColor: #F09393;
+$headingColor: #F9CC0F;
 $headingTextShadow: none;
-$backgroundColor: #0c5a5d;
-$linkColor: $blue;
+$backgroundColor: #0F505D;
+$linkColor: #0B7678;
 $linkColorHover: lighten( $linkColor, 20% );
-$selectionBackgroundColor: $magenta;
+$selectionBackgroundColor: #ED344E;
+
+.reveal.reveal pre, .reveal.reveal code {
+	font-family: "Courier New", monospace;
+}
 
 .reveal.reveal pre {
 	width: inherit;

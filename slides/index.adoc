@@ -1,7 +1,8 @@
 = Stateless authorization and delegation with Macaroons
 Julien Tanguy
-v1.0, 2017-05-18: Ncrafts 2017
-:homepage: https://github.com/jtanguy/macaroons-hands-on :twitter: jutanguy
+v1.1, 2017-10-15: Devfest 2017
+:homepage: https://github.com/jtanguy/macaroons-hands-on
+:twitter: jutanguy
 :github: jtanguy
 :blog: https://jtanguy.cleverapps.io
 :backend: revealjs
@@ -14,22 +15,6 @@ v1.0, 2017-05-18: Ncrafts 2017
 :revealjs_theme: valwin
 :title-slide-background-image: images/macaroons.jpg
 
-== Code
-
-[source, shell, subs="attributes, macros"]
-----
-git clone link:{homepage}[{homepage}]
-
-cd code
-
-yarn install
-----
-
-[NOTE.speaker]
-====
-Let's pray to the Wifi gods.
-====
-
 [.two-columns]
 == `whoami`
 
@@ -39,7 +24,6 @@ image::images/jutanguy.jpg[]
 --
 - Web developer
 - Functional enthusiast
-- First time speaking
 
 //
 
@@ -109,29 +93,12 @@ ____
 
 |*Identifier* | Text/UUID | link to the secret
 
-|*Location* | URL | Location indication of the emitter
+|*Location* | URL | Url of the emitter
 
-|*Signature* 2+| stem:[HMAC(secret,identifier)]
+|*Caveats* | [Caveat] | List of restrictions
+
+|*Signature* 2+| Cryptographic hash of the macaroon
 |===
-
-=== Code
-
-[source, javascript]
-.simple.js
-----
-include::simple.js[tags=frontmatter;simple]
-----
-
-=== Result
-
-[source, console]
-----
-$ node simple.js
-m: Simple macaroon
-location mayoi
-identifier it's a me, Mario
-signature 7339954339bb20b9ceeb0cd4fff91f66ddbe6cc824efa49f165cbd950bc1dc1f
-----
 
 == Caveats
 
@@ -144,7 +111,7 @@ Two types of caveats:
 - _first party_ caveats, which directly restrict the macaroon's authority, and
 - _third party_ caveats, which require additional evidence.
 
-== First party caveats
+=== First party caveats
 
 Simple assertions
 
@@ -154,74 +121,46 @@ Simple assertions
 - `time < 2017-05-18T14:45+02:00`
 ====
 
-=== Structure
+=== Adding first party caveats
 
-`cid: String`::
-Caveat id (the predicate)
+. Macaroon stem:[m] (secret, identifier, location)
+. assertion stem:[\mathcal{A}] = `account = 123456`
+. stem:[m].addFirstPartyCaveat(stem:[\mathcal{A}])
+. Done.
 
 
-== Computing the signature
+=== Signature
 
-The signature is computed by chaining the HMAC operations.
+When adding a caveat, the signature is recomputed by hashing the current signature and the caveat string.
 
 [.step]
-. stem:[sig_m = HMAC(secret, identifier)]
-. stem:[sig_{m_2} = HMAC(sig_m, c)]
-. stem:[sig_{m_3} = HMAC(sig_{m_2}, c_2)]
+- stem:[sig_0 = HMAC(secret,identifier)];
+- stem:[sig_1 = HMAC(sig_0, caveat_0)];
+- stem:[sig_2 = HMAC(sig_1, caveat_1)];
+- etc…
 
-=== Code
 
-[source, javascript]
-.simple.js
-----
-include::simple.js[tag=caveats]
-----
+=== Third party caveats
 
-=== Result
-
-[source, console]
-----
-$ node simple.js
-location mayoi
-identifier it's a me, Mario
-signature 7339954339bb20b9ceeb0cd4fff91f66ddbe6cc824efa49f165cbd950bc1dc1f
-
-m2: With a caveat c = 'talk = macaroons-hands-on'
-location mayoi
-identifier it's a me, Mario
-cid talk = macaroons-hands-on
-signature c247c5613203141be46a14008678a2aaec41d83c9cf69d7b10b5c4e533047abb
-
-m3: With a caveat c2 = 'time < 2017-05-18T14:45+02:00'
-location mayoi
-identifier it's a me, Mario
-cid talk = macaroons-hands-on
-cid time < 2017-05-18T14:45+02:00
-signature 4bd18fd10c0193ae25fc73ce3f89b46a64ffb6508025ba3faeb5acf2656a99f6
-----
-
-== Third party caveats
-
-- External predicates not listed in the macaroon
-- The predicate is sent to the third party, and an identifier is given back.
+External predicates not listed in the macaroon
 
 ====
 - The user must be logged to `auth.com` as _Alice_
 - The user must have a valid session on our service as _Bob_
 ====
 
+=== Adding third party caveat
 
-=== Structure
+[start=-3]
+. Assertion stem:[\mathcal{A}] = 'user = Alice'
+. Shared secret stem:[\mathcal{S}]
+. Send stem:[\mathcal{A} + \mathcal{S}] to link:#[auth.com]
+. Get back identifier stem:[\mathcal{id_{auth}}]
+. Macaroon stem:[m] (secret, identifier, location)
+. stem:[m].addThirdPartyCaveat(stem:[\mathcal{S}] ,stem:[\mathcal{id_{auth}}], link:#[auth.com])
+. Done.
 
-`key: String`::
-Predicate to be satisfied by the third party
-`cid: String`::
-Caveat Id (the third party identifier)
-`cl: Url`::
-Url of the third party
-`vid: String`::
-stem:[enc(sig, key)]
-
+NOTE: _The shared secret is **not** in the resulting token_
 
 == Verifying macaroons
 
@@ -230,38 +169,112 @@ stem:[enc(sig, key)]
 - First party caveats
 - Third party caveats
 
-
-
-== Verifying first party caveats
+=== Verifying the signature
 
 [.step]
-. Just check the predicate, parse it and verify it
+. stem:[sig_0 = HMAC(secret,identifier)];
+. stem:[sig_1 = HMAC(sig_0, caveat_0)];
+. stem:[sig_2 = HMAC(sig_1, caveat_1)];
+. etc…
+
+
+=== Verifying first party caveats
+
+[.step]
+. Parse the predicate
+. Verify it
 . ???
 . Profit !
 
-== Verifying third party caveats
+=== Verifying third party caveats
 
 Third party macaroons must be _discharged_ by another macaroon, which must verify
 
 [.step]
-- The root secret of the discharging macaroon must match the one used
-  to mint the caveat
+- The root secret of the discharging macaroon must match the one used to mint the caveat
 - The verifier id must match
 - The discharging caveat must be bound to the discharged caveat
 
-== Let's code
+== Macaroons vs JWT
 
-== Tootsample
+=== Similarities
+
+[.step]
+- Token
+- Signature
+
+=== Differences
+
+[frame=none, grid=none, options=header]
+|===
+| | Macaroon | JWT
+
+| Hashing algorithm | HMAC-SHA256  | In the payload
+
+| Additional data | Caveats (restrictive) | Claims (additive)
+
+| Delegation | Possible (client-side) | Impossible (new JWT required)
+|===
+
+
+== Usecases
+
+== File sharing website
+
+=== Dropbox/Google Drive clone
+
+- Access to files with macaroons
+- Shareable and re-shareable links
+
+=== Example
+
+[.step]
+. Macaroon stem:[m_{julien}]
+. Julien shares to Alice with a caveat
++
+`prefix = subfolder` -> stem:[m_{alice}]
+. Alice shares to Bob with a caveat
++
+`mode = readonly` -> stem:[m_{bob}]
+
+== Authorization for microservices
+
+Clever Cloud usecase
+
+- Immutable deployments
+- Microservice architecture
+- No trusted network model
+
+=== Managing build caches
+
+- Build caches backed up on a S3-like
+- Application deployer
+- Build cache uploader
+
+[.fragment]
+.Problem
+____
+Distributing keys and secrets to the build caches
+____
+
+=== New microservice: An S3 api gateway
+
+[.step]
+- Stores all the keys and secrets, encrypted in a database
+- A _root_ macaroon is given to the application deployer
+- The application deployer passes it to the build cache uploader
+- The build cache uploader can request pre-signed urls to the s3 gateway directly
+
 
 == Links
 
 [bibliography]
-- [[[pub41892]]] Arnar Birgisson and Joe Gibbs Politz and Úlfar Erlingsson and
-Ankur Taly and Michael Vrable and Mark Lentczner. Macaroons: Cookies with
-Contextual Caveats for Decentralized Authorization in the Cloud. Network and
+- [[[pub41892]]] Arnar Birgisson et al. _Macaroons: Cookies with
+Contextual Caveats for Decentralized Authorization in the Cloud_. Network and
 Distributed System Security Symposium, Internet Society. 2014.
 https://research.google.com/pubs/pub41892.html
-- [[[cordellBlog]]] Evan Cordell. Macaroons 101: Contextual Confinement.
+- [[[cordellBlog]]] Evan Cordell. _Macaroons 101: Contextual Confinement_.
 Elegent authorization, for a more civilized age. 2015.
 http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html
+- [[[libmacaroons]]] _First implementation_. https://github.com/rescrv/libmacaroons
 
