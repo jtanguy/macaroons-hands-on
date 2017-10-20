@@ -22,8 +22,8 @@ image::images/jutanguy.jpg[]
 
 [.align-left]
 --
-- Développeur
-- link:https://www.valwin.fr[Valwin]
+- Développeur chez link:https://www.valwin.fr[Valwin]
+- On recrute !
 
 //
 
@@ -39,7 +39,11 @@ Bonjour, je suis
 - Julien
 - Développeur chez Valwin
 - en recherche d'un dev front
+
+et je suis venu vous parler d'autorisation distribuée
 ====
+
+== Autorisation
 
 == Authentification vs Autorisation
 
@@ -55,14 +59,39 @@ ____
 
 [NOTE.speaker]
 ====
-Quand on parle d'auth sur le net, on mélange souvent deux concepts:
-- L'authentification, qui est le processus qui détermine qui suis-je, et
-- L'autorisation, qui est le processus qui détermine ce que j'ai le droit de faire.
+Quand on parle d'auth sur le net, on met souvent ensemble deux concepts:
+- L'authentification, qui est le processus qui détermine qui suis-je
+-- 2FA (ou MFA)
+-- mot de passe
+-- authenticator (TOTP)
 
-Dans cette présentation nous parlerons principalement d'autorisation.
+- L'autorisation, qui est le processus qui détermine ce que j'ai le droit de faire.
 ====
 
-== Exemple: Partage de fichiers
+=== _Bearer tokens_
+
+[quote, RFC6750]
+____
+A security token with the property that any party in possession of the token (a "bearer") can use the token in any way that any other party in possession of it can.
+____
+
+[NOTE.speaker]
+====
+En autorisation, on parle généralement de _bearer token_.
+C'est un token qui représente un ensemble de permissions, et toute personne qui possède ce token a le droit de faire les mêmes choses.
+====
+
+=== Exemple: Google drive
+
+https://drive.google.com/open?id=197u0vRt8_VvTa0GaNknMRVQkm-Q
+
+[NOTE.speaker]
+====
+Dans ce lien de partage de drive, on peut voir la partie `id`, qui représente quelque part ce qu'on appelle un _bearer token_, ou un badge d'accès à toute personne qui le possède.
+====
+
+
+== Cas d'usage: Partage de fichiers
 
 [.step]
 - Système de fichiers dans le cloud
@@ -82,38 +111,57 @@ Je lui envoie un lien qui lui permet d'accéder au dossier en question et elle p
 Seulement Alice souhaite faire relire certains fichiers à Bob, mais certains fichiers dans le dossier sont sensibles.
 
 Elle ne veut pas lui donner accès à tout le dossier, et est obligé de me redemander un lien pour le passer à Bob.
+
+Le problème (et l'avantage) avec les _bearer token_ classiques, c'est qu'un token, une fois émis, ne peut pas *évoluer* sans changement côté serveur.
+Je peux stocker une ACL dans une DB pour mes tokens, et faire évoluer cette ACL, mais Alice ne peut rien faire si elle n'a pas un compte sur le service.
 ====
-
-=== _Bearer tokens_
-
-https://drive.google.com/open?id=197u0vRt8_VvTa0GaNknMRVQkm-Q
-
-[NOTE.speaker]
-====
-Dans ce lien de partage de drive, on peut voir la partie `id`, qui représente quelque part ce qu'on appelle un _bearer token_, ou un badge d'accès à toute personne qui le possède.
-====
-
 
 == _Macaroons_
 
 - Papier de recherche Google publié en 2014 <<pub41892>>
 
-- _Bearer token_ avec une _signature_
 - Restriction des accès avec des _caveats_
 
 [NOTE.speaker]
 ====
+C'est dans cette optique que des chercheurs chez Google ont conçu le concept de _Macaroons: Des cookies avec des caveats pour de l'autorisation décentralisée dans le Cloud_
+
+Conceptuellement, ce sont des tokens que l'on peut affaiblir en y rajoutant des contraintes que l'on appelle des _caveats_.
+
+Alors concrètement un macaron c'est quoi ?
 ====
 
 == Anatomie d'un _macaroon_
 
+[.step]
 - Secret
-- Indentifiant,
+- Identifiant
 - Url
 - Signature
+- _Caveats_
 
 [NOTE.speaker]
 ====
+À la base, c'est un ensemble de 5 éléments:
+- un secret (une clé privée)
+- un identifiant (un lien vers le secret)
+- une url (pour identifier l'émetteur)
+- une signature (pour empêcher les contrefaçons)
+- un ou plusieurs _caveats_
+====
+
+=== Création
+
+. Macaroon stem:[m] = `Macaroon.create(secret, identifier, location)`
+. Done.
+
+[NOTE.speaker]
+====
+Pour créer un macaron, on prend notre secret, notre identifiant, et notre url, et on on appelle notre fonction create
+
+À la base, un macaron est appelé un macaron racine. Il a la plus grande autorité.
+
+On peut ensuite restreindre cette autorité en y rajoutant des caveats.
 ====
 
 == _Caveats_
@@ -122,12 +170,21 @@ ____
 Liste *ordonnée* de prédicats qui limitent l'autorité d'un _macaroon_
 ____
 
+[.fragment]
+====
 Deux types de _caveat_
 - primaires (_first party_)
 - tiers (_third party_)
+====
 
 [NOTE.speaker]
 ====
+C'est un ensemble de prédicats, ou de contraintes qui limitent l'autorité d'un macaron.
+
+
+Il existe deux types de caveats:
+- des caveats primaires, ou first-party caveats, et
+- des caveats tiers, ou third party caveats
 ====
 
 == _Caveats_ primaires
@@ -140,17 +197,25 @@ Deux types de _caveat_
 
 [NOTE.speaker]
 ====
+Les caveats primaires sont des prédicats émis et vérifiés pour l'émetteur du macaron.
+
+On peut tout mettre dedans, mais en général on utilise une forme standard du style
+
+clé >/=/< valeur
 ====
 
 === Ajout
 
-. Macaroon stem:[m] (secret, identifier, location)
-. assertion stem:[\mathcal{A}] = `account = 123456`
+[start=0, role=fullwidth]
+. Macaroon stem:[m],  assertion stem:[\mathcal{A}] = `account = 123456`
 . stem:[m].addFirstPartyCaveat(stem:[\mathcal{A}])
 . Done.
 
 [NOTE.speaker]
 ====
+Pour ajouter un caveat à un macaron, c'est très simple. 
+
+Il suffit de prendre n'importe quel macaron (que l'on a pas nécessairement créé), et d'y rajouter le caveat
 ====
 
 === Vérification
@@ -164,6 +229,7 @@ Deux types de _caveat_
 
 [NOTE.speaker]
 ====
+Le caveat est vérifié par l'émetteur du macaron, qui est indiqué dans le macaron (le champ _location_)
 ====
 
 
@@ -178,23 +244,35 @@ Prédicats externes non listés dans le _macaroon_.
 
 [NOTE.speaker]
 ====
+Les caveats tiers sont un moyen de créer des assertions entre différents services, ou différents émetteurs.
+
+Contrairement aux caveats primaires qui peuvent être rajoutés par n'importe qui sur n'importe quel macaron, les caveats tiers sont plutôt destinés aux restrictions de service à service
 ====
 
 === Ajout
 
-[start=-3]
-. Assertion stem:[\mathcal{A}] = 'user = Alice'
-. Secret partagé stem:[\mathcal{S}]
+[start=-3, role=fullwidth]
+. Assertion stem:[\mathcal{A}] = 'user = Alice', secret stem:[\mathcal{S}]
 . Envoi de stem:[\mathcal{A} + \mathcal{S}] à link:#[auth.com]
 . On récupère l'identifiant stem:[\mathcal{id_{auth}}]
-. Macaroon stem:[m] (secret, identifier, location)
+
+[start=0, role=fullwidth]
+. Macaroon stem:[m]
 . stem:[m].addThirdPartyCaveat(stem:[\mathcal{S}] ,stem:[\mathcal{id_{auth}}], link:#[auth.com])
 . Done.
 
+[.fragment]
 NOTE: _Le secret partagé n'est *pas* dans le macaron final_
 
 [NOTE.speaker]
 ====
+L'ajout d'un caveat tiers se passe en deux temps.
+
+Tout d'abord: on discute avec le tiers pour lui envoyer l'assertion et une clé secrète, et on récupère un identifiant. 
+
+Ensuite on ajoute le caveat, en lui passant les informations nécessaires.
+
+On note que le prédicat n'est pas passé au macaron. Si on inspecte le macaron, on ne peut pas savoir quelle est l'assertion utilisée par le caveat, si ce n'est son origine.
 ====
 
 === Vérification
@@ -203,6 +281,16 @@ Un _caveat_ tiers doit être _déchargé_ par un autre macaron.
 
 [NOTE.speaker]
 ====
+Pour vérifier le caveat tiers, il faut une information du tiers en question.
+
+Cette information est sous la forme d'un autre macaron, appelé macaron de décharge.
+C'est un macaron qui a été créé avec le secret partagé, et l'identifiant partagé.
+
+Il doit être également lié au macaron que l'on veut vérifier pour éviter la réutilisation.
+
+Il y a en plus une information supplémentaire dans le caveat (stem:[vid = Enc(sig, caveat\_key)])
+
+Comme c'est un macaron, il peut y avoir d'autres caveats primers ou tiers
 ====
 
 == Signature
@@ -217,12 +305,18 @@ La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 
 [NOTE.speaker]
 ====
+Je vous avais parlé tout à l'heure d'une signature. 
+
+C'est le mécanisme principal qui empêche d'enlever des caveats.
+
+HMAC: fonction de hash crypto qui ne peut (théoriquement) pas être inversée
 ====
 
 == _Macaroons_ vs JWT
 
 [NOTE.speaker]
 ====
+J'aimerais faire une petite comparaison avec les Json Web Tokens
 ====
 
 === Similitudes
@@ -230,10 +324,6 @@ La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 [.step]
 - Token
 - Signature
-
-[NOTE.speaker]
-====
-====
 
 === Différences
 
@@ -250,6 +340,8 @@ La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 
 [NOTE.speaker]
 ====
+Là où les claims sont additifs (on peut rajouter `admin: true`) à un JWT pour en augmenter le pouvoir,
+les caveats sont restrictifs (tout le monde peut en rajouter je vous le rappelle)
 ====
 
 == Exemple: Partage de fichiers
@@ -259,6 +351,7 @@ La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 
 [NOTE.speaker]
 ====
+Si on reprend notre exemple de tout à l'heure et qu'on y met des macarons
 ====
 
 === Exemple
@@ -274,7 +367,7 @@ La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 
 == Autorisation dans un contexte microservices
 
-image::images/cclogo.png[Clever Cloud, 200, 200, role=plain]
+image::images/cclogo.png[Clever Cloud, auto, 200, role=plain, background=white]
 
 - Infrastructure immutable
 - Microservices
@@ -285,12 +378,28 @@ image::images/cclogo.png[Clever Cloud, 200, 200, role=plain]
 
 === Gestion des caches de build
 
-- Caches sauvegardés sur leur S3-like
+- Caches sauvegardés sur un S3-like
 - Service qui gère le déploiement de l'application
 - Service qui gère le cache de build
 
 [NOTE.speaker]
 ====
+====
+
+== Implémentations
+
+http://macaroons.io
+
+.Langages supportés
+====
+C, C#, Go, Java, Javascript, Python, Ruby, Rust, PHP (Haskell)
+====
+
+[NOTE.speaker]
+====
+Vous pouvez tester des macarons sur le site macaroons.io, et il existe plusieurs bibliothèques dans différents languages.
+
+(Je mets haskell entre parenthèses car mon implem n'est pas encore totalement finie)
 ====
 
 == Liens
@@ -310,6 +419,3 @@ http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html
 - https://twitter.com/{twitter}
 - https://github.com/{github}
 - {blog}
-
-- https://www.valwin.fr
-- On recrute !

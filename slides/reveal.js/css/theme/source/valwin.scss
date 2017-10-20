@@ -40,6 +40,11 @@ $selectionBackgroundColor: #ED344E;
 	width: 100%;
 }
 
+.reveal .fullwidth {
+	width: 80%;
+	text-align: left;
+}
+
 .reveal .slides>section,
 .reveal .slides>section>section {
 	flex-direction: column;
