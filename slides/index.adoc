@@ -189,6 +189,7 @@ Pour créer un macaron, on prend notre secret, notre identifiant, et notre url, 
 On peut ensuite restreindre cette autorité en y rajoutant des caveats.
 ====
 
+[.fullwidth]
 . Macaroon stem:[m] = `Macaroon.create(secret, identifier, location)`
 . Done.
 
@@ -521,7 +522,7 @@ Vous pouvez tester des macarons sur le site macaroons.io, et il existe plusieurs
 
 http://macaroons.io
 
-.Langages supportés
+
 ====
 C, C#, Go, Java, Javascript, Python, Ruby, Rust, PHP (Haskell)
 ====

@@ -1,0 +1,222 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="author" content="Julien Tanguy"><meta name="copyright" content="CC BY 4.0"><title>Macarons: des cookies en mieux !</title><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"><link href="reveal.js/css/reveal.css" rel="stylesheet"><link rel="stylesheet" href="reveal.js/css/theme/valwin.css" id="theme"><script type="text/x-mathjax-config">MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [["\\(", "\\)"]],
+  displayMath: [["\\[", "\\]"]],
+  ignoreClass: "nostem|nolatexmath"
+},
+asciimath2jax: {
+  delimiters: [["\\$", "\\$"]],
+  ignoreClass: "nostem|noasciimath"
+},
+TeX: { equationNumbers: { autoNumber: "none" } }
+});</script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script><link href="reveal.js/lib/css/zenburn.css" rel="stylesheet"><script>document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );</script></head><body><div class="reveal"><div class="slides"><section class="title" data-state="title" data-background-image="images/macaroons.jpg"><h1>Macarons</h1><h2>des cookies en mieux !</h2><p class="author"><small>Julien Tanguy</small></p></section><section id="__code_whoami_code" class="two-columns"><h2><code>whoami</code></h2><aside class="notes"><div class="paragraph"><p>Bonjour, je suis</p></div>
+<div class="ulist"><ul><li><p>Julien</p></li><li><p>Développeur chez Valwin</p></li><li><p>en recherche d&#8217;un dev front</p></li></ul></div>
+<div class="paragraph"><p>et je suis venu vous parler d&#8217;autorisation distribuée</p></div></aside>
+<div class="imageblock" style=""><img src="images/jutanguy.jpg" alt="jutanguy"></div>
+<div class="openblock align-left"><div class="content"><div class="ulist"><ul><li><p>Développeur chez <a href="https://www.valwin.fr">Valwin</a></p></li><li><p>On recrute !</p></li></ul></div>
+<div class="ulist"><ul><li><p><a href="https://twitter.com/jutanguy" class="bare">https://twitter.com/jutanguy</a></p></li><li><p><a href="https://github.com/jtanguy" class="bare">https://github.com/jtanguy</a></p></li><li><p><a href="https://jtanguy.cleverapps.io" class="bare">https://jtanguy.cleverapps.io</a></p></li></ul></div></div></div></section>
+<section id="_autorisation"><h2>Autorisation</h2></section>
+<section><section id="_authentification_vs_autorisation"><h2>Authentification vs Autorisation</h2><aside class="notes"><div class="paragraph"><p>Quand on parle d&#8217;auth sur le net, on met souvent ensemble deux concepts:</p></div>
+<div class="ulist"><ul><li><p>L&#8217;authentification, qui est le processus qui détermine qui suis-je</p><div class="ulist"><ul><li><p>2FA (ou MFA)</p></li><li><p>mot de passe</p></li><li><p>authenticator (TOTP)</p></li></ul></div></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>L&#8217;autorisation, qui est le processus qui détermine ce que j&#8217;ai le droit de faire.</p></li></ul></div></aside><div class="quoteblock"><blockquote><div class="paragraph"><p>Qui suis-je ?</p></div></blockquote></div><div class="quoteblock fragment"><blockquote><div class="paragraph"><p>Qu&#8217;ai-je le droit de faire ?</p></div></blockquote></div></section><section id="__em_bearer_tokens_em"><h2><em>Bearer tokens</em></h2><aside class="notes"><div class="paragraph"><p>En autorisation, on parle généralement de <em>bearer token</em>.
+C&#8217;est un token qui représente un ensemble de permissions, et toute personne qui possède ce token a le droit de faire les mêmes choses.</p></div></aside>
+<div class="quoteblock"><blockquote><div class="paragraph"><p>A security token with the property that any party in possession of the token (a "bearer") can use the token in any way that any other party in possession of it can.</p></div></blockquote><div class="attribution">&#8212; RFC6750</div></div></section><section id="_exemple_google_drive"><h2>Exemple: Google drive</h2><aside class="notes"><div class="paragraph"><p>Dans ce lien de partage de drive, on peut voir la partie <code>id</code>, qui représente quelque part ce qu&#8217;on appelle un <em>bearer token</em>, ou un badge d&#8217;accès à toute personne qui le possède.</p></div></aside>
+<div class="paragraph"><p><a href="https://drive.google.com/open?id=197u0vRt8_VvTa0GaNknMRVQkm-Q" class="bare">https://drive.google.com/open?id=197u0vRt8_VvTa0GaNknMRVQkm-Q</a></p></div></section></section>
+<section id="_cas_d_usage_partage_de_fichiers"><h2>Cas d&#8217;usage: Partage de fichiers</h2><aside class="notes"><div class="paragraph"><p>Prenons un petit exemple de service dans lequel nous aimerions faire de l&#8217;autorisation.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>On a un service de partage de fichiers, dans lequel je stocke toutes mes données.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Je souhaite partager un de mes dossiers à Alice, car on travaille ensemble sur un projet et elle me relit.
+Je lui envoie un lien qui lui permet d&#8217;accéder au dossier en question et elle peut accéder aux fichiers.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Seulement Alice souhaite faire relire certains fichiers à Bob, mais certains fichiers dans le dossier sont sensibles.
+Elle ne veut pas lui donner accès à tout le dossier, et est obligé de me redemander un lien pour le passer à Bob.</p></div>
+<div class="paragraph"><p>Le problème (et l&#8217;avantage) avec les <em>bearer token</em> classiques, c&#8217;est qu&#8217;un token, une fois émis, ne peut pas <strong>évoluer</strong> sans changement côté serveur.
+Je peux stocker une ACL dans une DB pour mes tokens, et faire évoluer cette ACL, mais Alice ne peut rien faire si elle n&#8217;a pas un compte sur le service.</p></div></aside>
+<div class="ulist step"><ul><li class="fragment"><p>Système de fichiers dans le cloud</p></li><li class="fragment"><p>Je veux partager un dossier à <em>Alice</em></p></li><li class="fragment"><p><em>Alice</em> veut repartager une partie de ce dossier à <em>Bob</em></p></li></ul></div></section>
+<section id="__em_macaroons_em"><h2><em>Macaroons</em></h2><aside class="notes"><div class="paragraph"><p>timing:6min[]</p></div>
+<div class="paragraph"><p>C&#8217;est dans cette optique que des chercheurs chez Google ont conçu le concept de <em>Macaroons: Des cookies avec des caveats pour de l&#8217;autorisation décentralisée dans le Cloud</em></p></div>
+<div class="paragraph"><p>Conceptuellement, ce sont des tokens que l&#8217;on peut affaiblir en y rajoutant des contraintes que l&#8217;on appelle des <em>caveats</em>.</p></div>
+<div class="paragraph"><p>Alors concrètement un macaron c&#8217;est quoi ?</p></div></aside>
+<div class="ulist"><ul><li><p>Papier de recherche Google publié en 2014 <a href="#pub41892">[pub41892]</a></p></li><li><p>Restriction des accès avec des <em>caveats</em></p></li></ul></div></section>
+<section><section id="_anatomie_d_un_em_macaroon_em"><h2>Anatomie d&#8217;un <em>macaroon</em></h2><aside class="notes"><div class="paragraph"><p>À la base, c&#8217;est un ensemble de 5 éléments:</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>un secret (une clé privée)</p></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>un identifiant (un lien vers le secret)</p></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>une url (pour identifier l&#8217;émetteur)</p></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>une signature (pour empêcher les contrefaçons)</p></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>un ou plusieurs <em>caveats</em></p></li></ul></div></aside><div class="ulist step"><ul><li class="fragment"><p>Secret</p></li><li class="fragment"><p>Identifiant</p></li><li class="fragment"><p>Url</p></li><li class="fragment"><p>Signature</p></li><li class="fragment"><p><em>Caveats</em></p></li></ul></div></section><section id="_cration"><h2>Création</h2><aside class="notes"><div class="paragraph"><p>Pour créer un macaron, on prend notre secret, notre identifiant, et notre url, et on on appelle notre fonction create</p></div>
+<div class="paragraph"><p>À la base, un macaron est appelé un macaron racine. Il a la plus grande autorité.</p></div>
+<div class="paragraph"><p>On peut ensuite restreindre cette autorité en y rajoutant des caveats.</p></div></aside>
+<div class="olist arabic fullwidth"><ol class="arabic"><li><p>Macaroon \(m\) = <code>Macaroon.create(secret, identifier, location)</code></p></li><li><p>Done.</p></li></ol></div></section></section>
+<section id="__em_caveats_em"><h2><em>Caveats</em></h2><aside class="notes"><div class="paragraph"><p>C&#8217;est un ensemble de prédicats, ou de contraintes qui limitent l&#8217;autorité d&#8217;un macaron.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Il existe deux types de caveats:</p></div>
+<div class="ulist"><ul><li><p>des caveats primaires, ou first-party caveats, et</p></li><li><p>des caveats tiers, ou third party caveats</p></li></ul></div></aside>
+<div class="quoteblock"><blockquote><div class="paragraph"><p>Liste <strong>ordonnée</strong> de prédicats qui limitent l&#8217;autorité d&#8217;un <em>macaroon</em></p></div></blockquote></div>
+<div class="exampleblock fragment"><div class="content"><div class="paragraph"><p>Deux types de <em>caveat</em>
+* primaires (<em>first party</em>)
+* tiers (<em>third party</em>)</p></div></div></div></section>
+<section><section id="__em_caveats_em_primaires"><h2><em>Caveats</em> primaires</h2><aside class="notes"><div class="paragraph"><p>timing:8min[]</p></div>
+<div class="paragraph"><p>Les caveats primaires sont des prédicats émis et vérifiés pour l&#8217;émetteur du macaron.</p></div>
+<div class="paragraph"><p>On peut tout mettre dedans, mais en général on utilise une forme standard du style</p></div>
+<div class="paragraph"><p>clé &gt;/=/&lt; valeur</p></div></aside><div class="exampleblock"><div class="content"><div class="ulist"><ul><li><p><code>account = 123456</code></p></li><li><p><code>file in ["accounts.pdf","bills.pdf"]</code></p></li><li><p><code>time &lt; 2017-05-18T14:45+02:00</code></p></li></ul></div></div></div></section><section id="_ajout"><h2>Ajout</h2><aside class="notes"><div class="paragraph"><p>Pour ajouter un caveat à un macaron, c&#8217;est très simple.</p></div>
+<div class="paragraph"><p>Il suffit de prendre n&#8217;importe quel macaron (que l&#8217;on a pas nécessairement créé), et d&#8217;y rajouter le caveat</p></div></aside>
+<div class="olist arabic fullwidth"><ol class="arabic" start="0"><li><p>Macaroon \(m\),  assertion \(\mathcal{A}\) = <code>account = 123456</code></p></li><li><p>\(m\).addFirstPartyCaveat(\(\mathcal{A}\))</p></li><li><p>Done.</p></li></ol></div></section><section id="_vrification"><h2>Vérification</h2><aside class="notes"><div class="paragraph"><p>Le caveat est vérifié par l&#8217;émetteur du macaron, qui est indiqué dans le macaron (le champ <em>location</em>)</p></div></aside>
+<div class="exampleblock"><div class="content"><div class="ulist"><ul><li><p><code>account = 123456</code></p></li><li><p><code>file in ["accounts.pdf","bills.pdf"]</code></p></li><li><p><code>time &lt; 2017-05-18T14:45+02:00</code></p></li></ul></div></div></div></section></section>
+<section><section id="__em_caveats_em_tiers"><h2><em>Caveats</em> tiers</h2><aside class="notes"><div class="paragraph"><p>timing:12min[]</p></div>
+<div class="paragraph"><p>Les caveats tiers sont un moyen de créer des assertions entre différents services, ou différents émetteurs.</p></div>
+<div class="paragraph"><p>Contrairement aux caveats primaires qui peuvent être rajoutés par n&#8217;importe qui sur n&#8217;importe quel macaron, les caveats tiers sont plutôt destinés aux restrictions de service à service</p></div></aside><div class="paragraph"><p>Prédicats externes non listés dans le <em>macaroon</em>.</p></div><div class="exampleblock"><div class="content"><div class="ulist"><ul><li><p>L&#8217;utilisateur doit être authentifié chez <code>auth.com</code> comme <em>Alice</em></p></li><li><p>L&#8217;utilisateur doit être authentifié comme <em>Bob</em></p></li></ul></div></div></div></section><section id="_ajout_2"><h2>Ajout</h2><aside class="notes"><div class="paragraph"><p>L&#8217;ajout d&#8217;un caveat tiers se passe en deux temps.</p></div>
+<div class="paragraph"><p>Tout d&#8217;abord: on discute avec le tiers pour lui envoyer l&#8217;assertion et une clé secrète, et on récupère un identifiant.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Ensuite on ajoute le caveat, en lui passant les informations nécessaires.</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>On note que le prédicat n&#8217;est pas passé au macaron. Si on inspecte le macaron, on ne peut pas savoir quelle est l&#8217;assertion utilisée par le caveat, si ce n&#8217;est son origine.</p></div></aside>
+<div class="olist arabic fullwidth"><ol class="arabic" start="-3"><li><p>Assertion \(\mathcal{A}\) = 'user = Alice', secret \(\mathcal{S}\)</p></li><li><p>Envoi de \(\mathcal{A} + \mathcal{S}\) à <a href="#">auth.com</a></p></li><li><p>On récupère l&#8217;identifiant \(\mathcal{id_{auth}}\)</p></li></ol></div>
+<div class="olist arabic fullwidth fragment"><ol class="arabic" start="0"><li><p>Macaroon \(m\)</p></li><li><p>\(m\).addThirdPartyCaveat(\(\mathcal{S}\) ,\(\mathcal{id_{auth}}\), <a href="#">auth.com</a>)</p></li><li><p>Done.</p></li></ol></div>
+<div class="admonitionblock note fragment"><table><tr><td class="icon"><div class="title">Note</div></td><td class="content"><em>Le secret partagé n&#8217;est <strong>pas</strong> dans le macaron final</em></td></tr></table></div></section><section id="_vrification_2"><h2>Vérification</h2><aside class="notes"><div class="paragraph"><p>Pour vérifier le caveat tiers, il faut une information du tiers en question.</p></div>
+<div class="paragraph"><p>Cette information est sous la forme d&#8217;un autre macaron, appelé macaron de décharge.
+C&#8217;est un macaron qui a été créé avec le secret partagé, et l&#8217;identifiant partagé.</p></div>
+<div class="paragraph"><p>Il doit être également lié au macaron que l&#8217;on veut vérifier pour éviter la réutilisation.</p></div>
+<div class="paragraph"><p>Il y a en plus une information supplémentaire dans le caveat (\(vid = Enc(sig, caveat\_key)\))</p></div>
+<div class="paragraph"><p>Comme c&#8217;est un macaron, il peut y avoir d&#8217;autres caveats primers ou tiers</p></div></aside>
+<div class="paragraph"><p>Un <em>caveat</em> tiers doit être <em>déchargé</em> par un autre macaron.</p></div></section></section>
+<section id="_signature"><h2>Signature</h2><aside class="notes"><div class="paragraph"><p>timing:14min[]</p></div>
+<div class="paragraph"><p>Je vous avais parlé tout à l&#8217;heure d&#8217;une signature.</p></div>
+<div class="paragraph"><p>C&#8217;est le mécanisme principal qui empêche d&#8217;enlever des caveats.</p></div>
+<div class="paragraph"><p>Propriétés de la fonction HMAC: fonction de hash crypto qui ne peut (théoriquement) pas être inversée</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>La signature initiale est calculée grâce au secret et à l&#8217;identifiant</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Les signatures suivantes sont calculées en hashant la signature existante avec le nouveau caveat</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div></aside>
+<div class="paragraph"><p>La signature est recalculée à chaque fois que l&#8217;on rajoute un <em>caveat</em>.</p></div>
+<div class="olist arabic step"><ol class="arabic"><li class="fragment"><p>\(sig_0 = HMAC(secret,identifier)\);</p></li><li class="fragment"><p>\(sig_1 = HMAC(sig_0, caveat_0)\);</p></li><li class="fragment"><p>\(sig_2 = HMAC(sig_1, caveat_1)\);</p></li><li class="fragment"><p>etc…</p></li></ol></div></section>
+<section><section id="__em_macaroons_em_vs_jwt"><h2><em>Macaroons</em> vs JWT</h2><aside class="notes"><div class="paragraph"><p>J&#8217;aimerais faire une petite comparaison avec les Json Web Tokens</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Ce sont des tokens</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Ils sont une signature</p></div></aside></section><section id="_similitudes"><h2>Similitudes</h2><div class="ulist step"><ul><li class="fragment"><p>Token</p></li><li class="fragment"><p>Signature</p></li></ul></div></section><section id="_diffrences"><h2>Différences</h2><aside class="notes"><div class="paragraph"><p>Là où les claims sont additifs (on peut rajouter <code>admin: true</code>) à un JWT pour en augmenter le pouvoir,
+les caveats sont restrictifs (tout le monde peut en rajouter je vous le rappelle)</p></div></aside>
+<table class="tableblock frame-none grid-none" style="width:100%"><colgroup><col style="width:33.3333%"><col style="width:33.3333%"><col style="width:33.3334%"></colgroup><thead><tr><th class="tableblock halign-left valign-top"></th><th class="tableblock halign-left valign-top"><em>Macaroon</em></th><th class="tableblock halign-left valign-top">JWT</th></tr></thead><tbody><tr><td class="tableblock halign-left valign-top"><p class="tableblock">Algo de hash</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">HMAC-SHA256</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">Dans le JWT</p></td></tr><tr><td class="tableblock halign-left valign-top"><p class="tableblock">Donnée additionnelle</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">Caveats (soustractif)</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">Claims (additif)</p></td></tr><tr><td class="tableblock halign-left valign-top"><p class="tableblock">Délégation</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">Possible (client-side)</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">Impossible (nouveau JWT)</p></td></tr></tbody></table></section></section>
+<section><section id="_exemple_partage_de_fichiers"><h2>Exemple: Partage de fichiers</h2><aside class="notes"><div class="paragraph"><p>timing:16min[]</p></div>
+<div class="paragraph"><p>Si on reprend notre exemple de tout à l&#8217;heure et qu&#8217;on y met des macarons</p></div></aside><div class="ulist"><ul><li><p>Accès aux fichiers grâce à des macarons</p></li><li><p>On peut modifier et restreindre le partage</p></li></ul></div></section><section id="_exemple"><h2>Exemple</h2><aside class="notes"><div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Là dans notre exemple j&#8217;ai un macaroon \(m_{julien}\)</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Je le passe à alice en limitant à un sous-dossier</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Elle le passe à Bob en le limitant en lecture seule, sans passer par moi</p></div></aside>
+<div class="olist arabic step"><ol class="arabic"><li class="fragment"><p><em>Macaroon</em> \(m_{julien}\)</p></li><li class="fragment"><p><code>prefix = subfolder</code> &#8594; \(m_{alice}\)</p></li><li class="fragment"><p><code>mode = readonly</code> &#8594; \(m_{bob}\)</p></li></ol></div></section></section>
+<section><section id="_autorisation_dans_un_contexte_microservices"><h2>Autorisation dans un contexte microservices</h2><aside class="notes"><div class="paragraph"><p>Pour finir, prenons un exemple plus concret.</p></div>
+<div class="paragraph"><p>J&#8217;ai discuté récemment avec les gens de clever cloud et ils utilisent les macarons dans leur infra.</p></div>
+<div class="paragraph"><p>Tout d&#8217;abord un peu de contexte:</p></div>
+<div class="ulist"><ul><li><p>Ils font un cloud en mode PAAS</p></li><li><p>Ils ont une architecture immutable (les applications sont déployées dans une nouvelle VM)</p></li><li><p>Microservices</p></li></ul></div></aside><div class="imageblock plain" style=""><img src="images/cclogo.png" alt="Clever Cloud" width="auto" height="200" style="background: white"></div><div class="ulist"><ul><li><p>Infrastructure immutable</p></li><li><p>Microservices</p></li></ul></div></section><section id="_gestion_des_caches_de_build"><h2>Gestion des caches de build</h2><aside class="notes"><div class="paragraph"><p>NEXT</p></div>
+<div class="ulist"><ul><li><p>S3 like: On peut générer des urls présignées</p><div class="ulist"><ul><li><p>Problème du multipart upload</p></li><li><p>Donner les clés/secret du bucket au <em>build cache manager</em></p></li></ul></div></li></ul></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Problème: Gestion des caches de déploiement/build</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>Solution: une gateway qui utilise des macarons</p></div></aside>
+<div class="ulist step"><ul><li class="fragment"><p>Caches sauvegardés sur un S3-like</p></li><li class="fragment"><p>Service qui gère le déploiement de l&#8217;application</p></li><li class="fragment"><p>Service qui gère le cache de build</p></li><li class="fragment"><p>Proxy S3: API geteway</p></li></ul></div></section><section id="_utilisation_des_macarons"><h2>Utilisation des macarons</h2><aside class="notes"><div class="paragraph"><p>Demander des urls présignées en apportant la clé de déchiffrement</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div>
+<div class="paragraph"><p>NEXT</p></div></aside>
+<div class="olist arabic step"><ol class="arabic"><li class="fragment"><p>L'<em>application manager</em> crée un bucket pour stocker les caches de build</p></li><li class="fragment"><p>Les clés sont stockées <em>chiffrées</em> dans la DB de l'<em>API gateway</em></p></li><li class="fragment"><p>l'<em>API gateway</em> donne un macaron qui permet de demander des urls présignées</p></li><li class="fragment"><p>Le macaron est passé au <em>build cache manager</em>, qui peut discuter directement avec la <em>gateway S3</em></p></li></ol></div></section></section>
+<section id="_implmentations"><h2>Implémentations</h2><aside class="notes"><div class="paragraph"><p>Vous pouvez tester des macarons sur le site macaroons.io, et il existe plusieurs bibliothèques dans différents languages.</p></div>
+<div class="paragraph"><p>(Je mets haskell entre parenthèses car mon implem n&#8217;est pas encore totalement finie)</p></div></aside>
+<div class="paragraph"><p><a href="http://macaroons.io" class="bare">http://macaroons.io</a></p></div>
+<div class="exampleblock"><div class="content"><div class="paragraph"><p>C, C#, Go, Java, Javascript, Python, Ruby, Rust, PHP (Haskell)</p></div></div></div></section>
+<section id="_liens"><h2>Liens</h2><div class="ulist bibliography"><ul class="bibliography"><li><p><a id="libmacaroons"></a>[libmacaroons] <em>Implémentation de référence</em>. <a href="https://github.com/rescrv/libmacaroons" class="bare">https://github.com/rescrv/libmacaroons</a></p></li><li><p><a id="pub41892"></a>[pub41892] Arnar Birgisson et al. <em>Macaroons: Cookies with
+Contextual Caveats for Decentralized Authorization in the Cloud</em>. Network and
+Distributed System Security Symposium, Internet Society. 2014.
+<a href="https://research.google.com/pubs/pub41892.html" class="bare">https://research.google.com/pubs/pub41892.html</a></p></li><li><p><a id="cordellBlog"></a>[cordellBlog] Evan Cordell. <em>Macaroons 101: Contextual Confinement</em>.
+Elegent authorization, for a more civilized age. 2015.
+<a href="http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html" class="bare">http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html</a></p></li></ul></div></section>
+<section id="_merci"><h2>Merci</h2><div class="ulist"><ul><li><p><a href="https://twitter.com/jutanguy" class="bare">https://twitter.com/jutanguy</a></p></li><li><p><a href="https://github.com/jtanguy" class="bare">https://github.com/jtanguy</a></p></li><li><p><a href="https://jtanguy.cleverapps.io" class="bare">https://jtanguy.cleverapps.io</a></p></li></ul></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>// See https://github.com/hakimel/reveal.js#configuration for a full list of configuration options
+Reveal.initialize({
+  // Change the display
+  display: 'flex',
+  // Display controls in the bottom right corner
+  controls: true,
+  // Display a presentation progress bar
+  progress: true,
+  // Display the page number of the current slide
+  slideNumber: false,
+  // Push each slide change to the browser history
+  history: false,
+  // Enable keyboard shortcuts for navigation
+  keyboard: true,
+  // Enable the slide overview mode
+  overview: true,
+  // Vertical centering of slides
+  center: true,
+  // Enables touch navigation on devices with touch input
+  touch: true,
+  // Loop the presentation
+  loop: false,
+  // Change the presentation direction to be RTL
+  rtl: false,
+  // Turns fragments on and off globally
+  fragments: true,
+  // Flags if the presentation is running in an embedded mode,
+  // i.e. contained within a limited portion of the screen
+  embedded: false,
+  // Number of milliseconds between automatically proceeding to the
+  // next slide, disabled when set to 0, this value can be overwritten
+  // by using a data-autoslide attribute on your slides
+  autoSlide: 0,
+  // Stop auto-sliding after user input
+  autoSlideStoppable: true,
+  // Enable slide navigation via mouse wheel
+  mouseWheel: false,
+  // Hides the address bar on mobile devices
+  hideAddressBar: true,
+  // Opens links in an iframe preview overlay
+  previewLinks: false,
+  // Theme (e.g., beige, black, league, night, serif, simple, sky, solarized, white)
+  // NOTE setting the theme in the config no longer works in reveal.js 3.x
+  //theme: Reveal.getQueryHash().theme || 'valwin',
+  // Transition style (e.g., none, fade, slide, convex, concave, zoom)
+  transition: Reveal.getQueryHash().transition || 'slide',
+  // Transition speed (e.g., default, fast, slow)
+  transitionSpeed: 'default',
+  // Transition style for full page slide backgrounds (e.g., none, fade, slide, convex, concave, zoom)
+  backgroundTransition: 'fade',
+  // Number of slides away from the current that are visible
+  viewDistance: 3,
+  // Parallax background image (e.g., "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'")
+  parallaxBackgroundImage: '',
+  // Parallax background size in CSS syntax (e.g., "2100px 900px")
+  parallaxBackgroundSize: '',
+
+  // The "normal" size of the presentation, aspect ratio will be preserved
+  // when the presentation is scaled to fit different resolutions. Can be
+  // specified using percentage units.
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around the content
+  margin: 0.1,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 1.5,
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+});</script></body></html>

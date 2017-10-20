@@ -12,6 +12,10 @@ html * {
 .reveal .quoteblock {
   width: 100%; }
 
+.reveal .fullwidth {
+  width: 80%;
+  text-align: left; }
+
 .reveal .slides > section,
 .reveal .slides > section > section {
   flex-direction: column;
@@ -32,6 +36,11 @@ html * {
   border: 0;
   box-shadow: none; }
 
+.reveal .author {
+  color: #F9CC0F;
+  font-family: "Futura Md BT", "Average Sans", sans-serif;
+  font-size: 2em; }
+
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
@@ -40,7 +49,7 @@ body {
   background-color: #0F505D; }
 
 .reveal {
-  font-family: "Brandon Grotesque", "Lato", sans-serif;
+  font-family: "Brandon Grotesque", "Average Sans", sans-serif;
   font-size: 35px;
   font-weight: normal;
   color: #ededed; }
@@ -71,7 +80,7 @@ body {
 .reveal h6 {
   margin: 0 0 20px 0;
   color: #F9CC0F;
-  font-family: "Futura Md BT", "League Gothic", Impact, sans-serif;
+  font-family: "Futura Md BT", "Average Sans", sans-serif;
   font-weight: normal;
   line-height: 1.2;
   letter-spacing: normal;
@@ -235,20 +244,20 @@ body {
  * LINKS
  *********************************************/
 .reveal a {
-  color: #0B7678;
+  color: #98C01F;
   text-decoration: none;
   -webkit-transition: color .15s ease;
   -moz-transition: color .15s ease;
   transition: color .15s ease; }
 
 .reveal a:hover {
-  color: #14d2d5;
+  color: #c4e560;
   text-shadow: none;
   border: none; }
 
 .reveal .roll span:after {
   color: #fff;
-  background: #053132; }
+  background: #647e14; }
 
 /*********************************************
  * IMAGES
@@ -270,7 +279,7 @@ body {
 
 .reveal a:hover img {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #0B7678;
+  border-color: #98C01F;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.55); }
 
 /*********************************************
@@ -278,31 +287,31 @@ body {
  *********************************************/
 .reveal .controls .navigate-left,
 .reveal .controls .navigate-left.enabled {
-  border-right-color: #0B7678; }
+  border-right-color: #98C01F; }
 
 .reveal .controls .navigate-right,
 .reveal .controls .navigate-right.enabled {
-  border-left-color: #0B7678; }
+  border-left-color: #98C01F; }
 
 .reveal .controls .navigate-up,
 .reveal .controls .navigate-up.enabled {
-  border-bottom-color: #0B7678; }
+  border-bottom-color: #98C01F; }
 
 .reveal .controls .navigate-down,
 .reveal .controls .navigate-down.enabled {
-  border-top-color: #0B7678; }
+  border-top-color: #98C01F; }
 
 .reveal .controls .navigate-left.enabled:hover {
-  border-right-color: #14d2d5; }
+  border-right-color: #c4e560; }
 
 .reveal .controls .navigate-right.enabled:hover {
-  border-left-color: #14d2d5; }
+  border-left-color: #c4e560; }
 
 .reveal .controls .navigate-up.enabled:hover {
-  border-bottom-color: #14d2d5; }
+  border-bottom-color: #c4e560; }
 
 .reveal .controls .navigate-down.enabled:hover {
-  border-top-color: #14d2d5; }
+  border-top-color: #c4e560; }
 
 /*********************************************
  * PROGRESS BAR
@@ -311,7 +320,7 @@ body {
   background: rgba(0, 0, 0, 0.2); }
 
 .reveal .progress span {
-  background: #0B7678;
+  background: #98C01F;
   -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
