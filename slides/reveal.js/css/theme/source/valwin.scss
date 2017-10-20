@@ -23,7 +23,7 @@ $mainFontSize: 35px;
 $headingColor: #F9CC0F;
 $headingTextShadow: none;
 $backgroundColor: #0F505D;
-$linkColor: #0B7678;
+$linkColor: #98C01F;
 $linkColorHover: lighten( $linkColor, 20% );
 $selectionBackgroundColor: #ED344E;
 
@@ -68,6 +68,13 @@ $selectionBackgroundColor: #ED344E;
 .reveal section .plain img {
 	border: 0;
 	box-shadow: none;
+}
+
+.reveal .author {
+	color: $headingColor;
+	font-family: $headingFont;
+	font-size: $heading2Size;
+
 }
 
 
