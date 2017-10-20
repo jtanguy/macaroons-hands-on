@@ -4,12 +4,12 @@ let reveal_css = run({
   name: 'reveal.js themes',
   sh: 'grunt css-themes',
   cwd: './reveal.js',
-  watch: './reveal.js/css/theme/source/'
+  watch: 'css/theme/source/valwin.scss'
 });
 
 let adoc = run({
   name: 'asciidoc',
-  sh: 'asciidoctor -T ~/.local/share/asciidoctor/asciidoctor-reveal.js/templates/slim/ index.adoc',
+  sh: 'asciidoctor -r asciidoctor-diagram -T ~/.local/share/asciidoctor/asciidoctor-reveal.js/templates/slim/ index.adoc',
   watch: ['*.adoc', '*.js']
 });
 
@@ -18,4 +18,5 @@ let server = runServer({
   sh: `lserver -p ${httpPort}`,
 })
 
-proxy(server, 8080).dependsOn(reveal_css, adoc)
+server.dependsOn(reveal_css, adoc)
+proxy(server, 8080)

@@ -1,11 +1,4 @@
-/**
- * Solarized Light theme for reveal.js.
- * Author: Achim Staebler
- */
 @import url("https://fonts.googleapis.com/css?family=Average+Sans");
-/**
- * Solarized colors by Ethan Schoonover
- */
 html * {
   color-profile: sRGB;
   rendering-intent: auto; }
@@ -15,6 +8,9 @@ html * {
 
 .reveal.reveal pre {
   width: inherit; }
+
+.reveal .quoteblock {
+  width: 100%; }
 
 .reveal .slides > section,
 .reveal .slides > section > section {
@@ -31,6 +27,10 @@ html * {
   .reveal .slides > section .align-left,
   .reveal .slides > section > section .align-left {
     text-align: left; }
+
+.reveal section .plain img {
+  border: 0;
+  box-shadow: none; }
 
 /*********************************************
  * GLOBAL STYLES

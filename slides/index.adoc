@@ -1,7 +1,7 @@
-= Stateless authorization and delegation with Macaroons
+= Macarons: des cookies en mieux !
 Julien Tanguy
-v1.1, 2017-10-15: Devfest 2017
-:homepage: https://github.com/jtanguy/macaroons-hands-on
+v2.0-fr, 2017-10-20: Devfest 2017
+:homepage: https://github.com/jtanguy/devfest-macaroons
 :twitter: jutanguy
 :github: jtanguy
 :blog: https://jtanguy.cleverapps.io
@@ -22,98 +22,115 @@ image::images/jutanguy.jpg[]
 
 [.align-left]
 --
-- Web developer
-- Functional enthusiast
+- Développeur
+- link:https://www.valwin.fr[Valwin]
 
 //
 
 - https://twitter.com/{twitter}
 - https://github.com/{github}
-- https://jtanguy.cleverapps.io
+- {blog}
 --
 
-== Authentication
+[NOTE.speaker]
+====
+Bonjour, je suis
 
-[quote, https://crypto.stackexchange.com/tags/authentication/info]
+- Julien
+- Développeur chez Valwin
+- en recherche d'un dev front
+====
+
+== Authentification vs Autorisation
+
 ____
-Authentication is successfully validating that an entity you are communicating
-with is actually who they claim to be.
+Qui suis-je ?
 ____
+
+[.fragment]
+____
+Qu'ai-je le droit de faire ?
+____
+
 
 [NOTE.speaker]
 ====
-This talk is about authorization and not authentication.
+Quand on parle d'auth sur le net, on mélange souvent deux concepts:
+- L'authentification, qui est le processus qui détermine qui suis-je, et
+- L'autorisation, qui est le processus qui détermine ce que j'ai le droit de faire.
+
+Dans cette présentation nous parlerons principalement d'autorisation.
 ====
 
-== Authorization
+== Exemple: Partage de fichiers
 
-[quote]
-____
-Authorization is according or denying permission to a -- usually authenticated -- user.
-____
-
+[.step]
+- Système de fichiers dans le cloud
+- Je veux partager un dossier à _Alice_
+- _Alice_ veut repartager une partie de ce dossier à _Bob_
 
 [NOTE.speaker]
 ====
-This talk is about authorization and not authentication.
+Prenons un petit exemple de service dans lequel nous aimerions faire de l'autorisation.
+
+On a un service de partage de fichiers, dans lequel je stocke toutes mes données.
+
+Je souhaite partager un de mes dossiers à Alice, car on travaille ensemble sur un projet et elle me relit.
+
+Je lui envoie un lien qui lui permet d'accéder au dossier en question et elle peut accéder aux fichiers.
+
+Seulement Alice souhaite faire relire certains fichiers à Bob, mais certains fichiers dans le dossier sont sensibles.
+
+Elle ne veut pas lui donner accès à tout le dossier, et est obligé de me redemander un lien pour le passer à Bob.
+====
+
+=== _Bearer tokens_
+
+https://drive.google.com/open?id=197u0vRt8_VvTa0GaNknMRVQkm-Q
+
+[NOTE.speaker]
+====
+Dans ce lien de partage de drive, on peut voir la partie `id`, qui représente quelque part ce qu'on appelle un _bearer token_, ou un badge d'accès à toute personne qui le possède.
 ====
 
 
-=== Authorization schemes
+== _Macaroons_
 
-- ACL linked directly to the user
-- Anonymous bearer tokens
+- Papier de recherche Google publié en 2014 <<pub41892>>
 
-=== Bearer tokens
+- _Bearer token_ avec une _signature_
+- Restriction des accès avec des _caveats_
 
-[quote]
-____
-A bearer token is a representation of a set of permissions.
-____
+[NOTE.speaker]
+====
+====
 
-=== Example permissions
+== Anatomie d'un _macaroon_
 
-- Viewing a specific file
-- View and edit a specific file
-- Anything a certain user can do
+- Secret
+- Indentifiant,
+- Url
+- Signature
 
-== Macaroons
+[NOTE.speaker]
+====
+====
 
-- Google research paper published in 2014 <<pub41892>>
-
-- Bearer token with a _signature_
-- Decentralized _attenuation_ and _contextual confinment_ with _caveats_
-
-== Anatomy of a macaroon
-
-[frame=none, grid=none]
-|===
-
-|*Secret* | Nonce | Secret Key
-
-|*Identifier* | Text/UUID | link to the secret
-
-|*Location* | URL | Url of the emitter
-
-|*Caveats* | [Caveat] | List of restrictions
-
-|*Signature* 2+| Cryptographic hash of the macaroon
-|===
-
-== Caveats
+== _Caveats_
 
 ____
-*Ordered* list of _predicates_ which restrict the macaroon's authority
+Liste *ordonnée* de prédicats qui limitent l'autorité d'un _macaroon_
 ____
 
-Two types of caveats:
+Deux types de _caveat_
+- primaires (_first party_)
+- tiers (_third party_)
 
-- _first party_ caveats, which directly restrict the macaroon's authority, and
-- _third party_ caveats, which require additional evidence.
+[NOTE.speaker]
+====
+====
 
-=== First party caveats
-
-Simple assertions
+== _Caveats_ primaires
 
 ====
 - `account = 123456`
@@ -121,17 +138,76 @@ Simple assertions
 - `time < 2017-05-18T14:45+02:00`
 ====
 
-=== Adding first party caveats
+[NOTE.speaker]
+====
+====
+
+=== Ajout
 
 . Macaroon stem:[m] (secret, identifier, location)
 . assertion stem:[\mathcal{A}] = `account = 123456`
 . stem:[m].addFirstPartyCaveat(stem:[\mathcal{A}])
 . Done.
 
+[NOTE.speaker]
+====
+====
 
-=== Signature
+=== Vérification
 
-When adding a caveat, the signature is recomputed by hashing the current signature and the caveat string.
+====
+- `account = 123456`
+- `file in ["accounts.pdf","bills.pdf"]`
+- `time < 2017-05-18T14:45+02:00`
+====
+
+
+[NOTE.speaker]
+====
+====
+
+
+== _Caveats_ tiers
+
+Prédicats externes non listés dans le _macaroon_.
+
+====
+- L'utilisateur doit être authentifié chez `auth.com` comme _Alice_
+- L'utilisateur doit être authentifié comme _Bob_
+====
+
+[NOTE.speaker]
+====
+====
+
+=== Ajout
+
+[start=-3]
+. Assertion stem:[\mathcal{A}] = 'user = Alice'
+. Secret partagé stem:[\mathcal{S}]
+. Envoi de stem:[\mathcal{A} + \mathcal{S}] à link:#[auth.com]
+. On récupère l'identifiant stem:[\mathcal{id_{auth}}]
+. Macaroon stem:[m] (secret, identifier, location)
+. stem:[m].addThirdPartyCaveat(stem:[\mathcal{S}] ,stem:[\mathcal{id_{auth}}], link:#[auth.com])
+. Done.
+
+NOTE: _Le secret partagé n'est *pas* dans le macaron final_
+
+[NOTE.speaker]
+====
+====
+
+=== Vérification
+
+Un _caveat_ tiers doit être _déchargé_ par un autre macaron.
+
+[NOTE.speaker]
+====
+====
+
+== Signature
+
+La signature est recalculée à chaque fois que l'on rajoute un _caveat_.
 
 [.step]
 - stem:[sig_0 = HMAC(secret,identifier)];
@@ -139,136 +215,88 @@ When adding a caveat, the signature is recomputed by hashing the current signatu
 - stem:[sig_2 = HMAC(sig_1, caveat_1)];
 - etc…
 
-
-=== Third party caveats
-
-External predicates not listed in the macaroon
-
+[NOTE.speaker]
 ====
-- The user must be logged to `auth.com` as _Alice_
-- The user must have a valid session on our service as _Bob_
 ====
 
-=== Adding third party caveat
+== _Macaroons_ vs JWT
 
-[start=-3]
-. Assertion stem:[\mathcal{A}] = 'user = Alice'
-. Shared secret stem:[\mathcal{S}]
-. Send stem:[\mathcal{A} + \mathcal{S}] to link:#[auth.com]
-. Get back identifier stem:[\mathcal{id_{auth}}]
-. Macaroon stem:[m] (secret, identifier, location)
-. stem:[m].addThirdPartyCaveat(stem:[\mathcal{S}] ,stem:[\mathcal{id_{auth}}], link:#[auth.com])
-. Done.
+[NOTE.speaker]
+====
+====
 
-NOTE: _The shared secret is **not** in the resulting token_
-
-== Verifying macaroons
-
-[.step]
-- Signature
-- First party caveats
-- Third party caveats
-
-=== Verifying the signature
-
-[.step]
-. stem:[sig_0 = HMAC(secret,identifier)];
-. stem:[sig_1 = HMAC(sig_0, caveat_0)];
-. stem:[sig_2 = HMAC(sig_1, caveat_1)];
-. etc…
-
-
-=== Verifying first party caveats
-
-[.step]
-. Parse the predicate
-. Verify it
-. ???
-. Profit !
-
-=== Verifying third party caveats
-
-Third party macaroons must be _discharged_ by another macaroon, which must verify
-
-[.step]
-- The root secret of the discharging macaroon must match the one used to mint the caveat
-- The verifier id must match
-- The discharging caveat must be bound to the discharged caveat
-
-== Macaroons vs JWT
-
-=== Similarities
+=== Similitudes
 
 [.step]
 - Token
 - Signature
 
-=== Differences
+[NOTE.speaker]
+====
+====
+
+=== Différences
 
 [frame=none, grid=none, options=header]
 |===
-| | Macaroon | JWT
+| | _Macaroon_ | JWT
 
-| Hashing algorithm | HMAC-SHA256  | In the payload
+| Algo de hash | HMAC-SHA256  | Dans le JWT
 
-| Additional data | Caveats (restrictive) | Claims (additive)
+| Donnée additionnelle | Caveats (soustractif) | Claims (additif)
 
-| Delegation | Possible (client-side) | Impossible (new JWT required)
+| Délégation | Possible (client-side) | Impossible (nouveau JWT)
 |===
 
+[NOTE.speaker]
+====
+====
 
-== Usecases
+== Exemple: Partage de fichiers
 
-== File sharing website
+- Accès aux fichiers grâce à des macarons
+- On peut modifier et restreindre le partage
 
-=== Dropbox/Google Drive clone
+[NOTE.speaker]
+====
+====
 
-- Access to files with macaroons
-- Shareable and re-shareable links
-
-=== Example
-
-[.step]
-. Macaroon stem:[m_{julien}]
-. Julien shares to Alice with a caveat
-+
-`prefix = subfolder` -> stem:[m_{alice}]
-. Alice shares to Bob with a caveat
-+
-`mode = readonly` -> stem:[m_{bob}]
-
-== Authorization for microservices
-
-Clever Cloud usecase
-
-- Immutable deployments
-- Microservice architecture
-- No trusted network model
-
-=== Managing build caches
-
-- Build caches backed up on a S3-like
-- Application deployer
-- Build cache uploader
-
-[.fragment]
-.Problem
-____
-Distributing keys and secrets to the build caches
-____
-
-=== New microservice: An S3 api gateway
+=== Exemple
 
 [.step]
-- Stores all the keys and secrets, encrypted in a database
-- A _root_ macaroon is given to the application deployer
-- The application deployer passes it to the build cache uploader
-- The build cache uploader can request pre-signed urls to the s3 gateway directly
+. _Macaroon_ stem:[m_{julien}]
+. `prefix = subfolder` -> stem:[m_{alice}]
+. `mode = readonly` -> stem:[m_{bob}]
 
+[NOTE.speaker]
+====
+====
 
-== Links
+== Autorisation dans un contexte microservices
+
+image::images/cclogo.png[Clever Cloud, 200, 200, role=plain]
+
+- Infrastructure immutable
+- Microservices
+
+[NOTE.speaker]
+====
+====
+
+=== Gestion des caches de build
+
+- Caches sauvegardés sur leur S3-like
+- Service qui gère le déploiement de l'application
+- Service qui gère le cache de build
+
+[NOTE.speaker]
+====
+====
+
+== Liens
 
 [bibliography]
+- [[[libmacaroons]]] _Implémentation de référence_. https://github.com/rescrv/libmacaroons
 - [[[pub41892]]] Arnar Birgisson et al. _Macaroons: Cookies with
 Contextual Caveats for Decentralized Authorization in the Cloud_. Network and
 Distributed System Security Symposium, Internet Society. 2014.
@@ -276,5 +304,12 @@ https://research.google.com/pubs/pub41892.html
 - [[[cordellBlog]]] Evan Cordell. _Macaroons 101: Contextual Confinement_.
 Elegent authorization, for a more civilized age. 2015.
 http://evancordell.com/2015/09/27/macaroons-101-contextual-confinement.html
-- [[[libmacaroons]]] _First implementation_. https://github.com/rescrv/libmacaroons
 
+== Merci
+
+- https://twitter.com/{twitter}
+- https://github.com/{github}
+- {blog}
+
+- https://www.valwin.fr
+- On recrute !
